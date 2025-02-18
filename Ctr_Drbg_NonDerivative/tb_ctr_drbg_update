@@ -1,0 +1,64 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 02/18/2025 04:41:43 PM
+// Design Name: 
+// Module Name: tb_ctr_drbg_update
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module tb_ctr_drbg_update;
+    logic clk;
+    logic rst;
+    logic [383:0] provided_data;
+    logic [255:0] key;
+    logic [127:0] V;
+    logic [255:0] new_key;
+    logic [127:0] new_V;
+
+    ctr_drbg_update dut (
+        .clk(clk),
+        .rst(rst),
+        .provided_data(provided_data),
+        .key(key),
+        .V(V),
+        .new_key(new_key),
+        .new_V(new_V)
+    );
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;  // 10 time units clock period
+    end
+
+    // Test sequence
+    initial begin
+        rst = 1;
+        provided_data = 384'h1234_5678_9ABC_DEF0_1234_5678_9ABC_DEF0_1234_5678_9ABC_DEF0;
+        key = 256'h1111_2222_3333_4444_5555_6666_7777_8888_9999_AAAA_BBBB_CCCC_DDDD_EEEE_FFFF_0000;
+        V = 128'h0000_0000_0000_0000_0000_0000_0000_0001;
+
+        #10 rst = 0;
+        
+        #100;  // Wait for output
+
+        $display("New Key: %h", new_key);
+        $display("New V: %h", new_V);
+
+        $finish;
+    end
+endmodule
