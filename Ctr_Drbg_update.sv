@@ -1,54 +1,46 @@
-module CTR_DRBG_Update #( 
-    parameter BLOCKLEN = 128,  // Block length in bits (e.g., 128 for AES)
-    parameter KEYLEN = 128,    // Key length in bits (e.g., 128 for AES)
-    parameter SEEDLEN = 256    // Seed length in bits (must be a multiple of BLOCKLEN)
-) (
-    input  logic [SEEDLEN-1:0] provided_data,
-    input  logic [KEYLEN-1:0]  Key_in,
-    input  logic [BLOCKLEN-1:0] V_in,
-    output logic [KEYLEN-1:0]  Key_out,
-    output logic [BLOCKLEN-1:0] V_out
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 02/18/2025 04:40:16 PM
+// Design Name: 
+// Module Name: ctr_drbg_update
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: Updated with XOR-based state update logic
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+module ctr_drbg_update (
+    input logic clk,
+    input logic rst,
+    input logic [383:0] provided_data,  // Updated to 384 bits
+    input logic [255:0] key,            // 256 bits for AES-256
+    input logic [127:0] V,              // Initialization vector
+    output logic [255:0] new_key,       // Updated to 256 bits
+    output logic [127:0] new_V
 );
 
-    logic [SEEDLEN-1:0] temp;
-    logic [BLOCKLEN-1:0] V_temp;
-    logic [KEYLEN-1:0] Key_temp;
-
-    // Temporary register for output blocks
-    logic [BLOCKLEN-1:0] output_block;
-    
-    // Block encryption function (stub for now, replace with AES encryption)
-    function [BLOCKLEN-1:0] Block_Encrypt (
-        input logic [KEYLEN-1:0] Key,
-        input logic [BLOCKLEN-1:0] V
-    );
-        // Placeholder for encryption operation
-        Block_Encrypt = V ^ Key;  // Simplified for example
+    // Block Encryption function
+    function [255:0] block_encrypt (input [255:0] key, input [127:0] data);
+        block_encrypt = {data, data} ^ key;  // Simplified encryption for illustration purposes
     endfunction
 
-    initial begin
-        temp = 0;
-        V_temp = V_in;
-
-        // Generate seedlen bits
-        while ($bits(temp) < SEEDLEN) begin
-            // Increment V
-            V_temp = V_temp + 1; // Simplified, assumes no ctr_len logic here
-            output_block = Block_Encrypt(Key_in, V_temp);
-
-            // Truncate the concatenation to SEEDLEN bits
-            temp = {temp, output_block};  
-            temp = temp[SEEDLEN-1:0];  // Ensure temp is only SEEDLEN bits
+    // Sequential logic for updating new_key and new_V
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst) begin
+            new_key <= 256'h0;  // Reset new_key to all zeros
+            new_V <= 128'h0;    // Reset new_V to all zeros
+        end else begin
+            // XOR-based logic to update key and V
+            new_key <= key ^ provided_data[255:0];   // XOR key with lower 256 bits of provided data
+            new_V <= V ^ provided_data[127:0];       // XOR V with lower 128 bits of provided data
         end
-
-        // XOR temp with provided_data
-        temp = temp ^ provided_data;
-
-        // Update Key and V
-        Key_temp = temp[SEEDLEN-1:SEEDLEN-KEYLEN];  // Extract keylen bits for Key
-        V_temp   = temp[KEYLEN-1:0];                // Extract blocklen bits for V
-
-        Key_out = Key_temp;
-        V_out   = V_temp;
     end
 endmodule

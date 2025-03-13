@@ -1,9 +1,9 @@
-timescale 1ns / 1ps
+`timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
 // 
-// Create Date: 03/12/2025 07:32:32 AM
+// Create Date: 03/12/2025 07:52:01 PM
 // Design Name: 
 // Module Name: update
 // Project Name: 
@@ -19,6 +19,8 @@ timescale 1ns / 1ps
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+
+
 module update (
     input logic clk,
     input logic rst,
@@ -29,10 +31,10 @@ module update (
     output logic done
 );
     
-    logic [383:0] temp;
+    // Full 256-bit key definition
     logic [255:0] static_key = 256'h0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef;
     logic [127:0] static_v = 128'h0123456789abcdef0123456789abcdef;
-    
+
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin
             key <= 256'b0;
@@ -47,7 +49,6 @@ module update (
         end
     end
 
-
-
 endmodule
+
 

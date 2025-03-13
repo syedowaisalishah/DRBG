@@ -1,9 +1,9 @@
-timescale 1ns / 1ps
+`timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
 // 
-// Create Date: 03/12/2025 07:33:26 AM
+// Create Date: 03/12/2025 07:53:13 PM
 // Design Name: 
 // Module Name: update_test
 // Project Name: 
@@ -18,6 +18,7 @@ timescale 1ns / 1ps
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
+
 
 
 module update_test;
@@ -45,11 +46,11 @@ module update_test;
     always #5 clk = ~clk;
 
     // Test Sequence
-  initial begin
+    initial begin
         clk = 0;
         rst = 1;
         start = 0;
-        provided_data = 384'h0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef;
+        provided_data = 384'h0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef; // Ensure full 384-bit data
         
         #10 rst = 0;
         #10 start = 1;   // Keep start HIGH for multiple cycles
@@ -61,6 +62,4 @@ module update_test;
         $finish;
     end
 
-
 endmodule
-
